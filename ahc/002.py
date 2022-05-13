@@ -9,4 +9,3 @@ for _ in range(num):
 
 # solution1 print null string (4861 points)
 print()
-
