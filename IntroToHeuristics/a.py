@@ -17,14 +17,13 @@ v = 0
 for i in range(d):
     max_t, max_v = 0, 0
     for t in range(num):
-        tmp_v = v
-        tmp = last[t]
+        tmp, tmp_v = last[t], v
         last[t] = i + 1
+
         tmp_v += s[i][t]
         tmp_v -= decrease(i)
         if max_v < tmp_v:
-            max_t = t
-            max_v = tmp_v
+            max_t, max_v = t, tmp_v
         last[t] = tmp
     last[max_t] = i + 1
     v = max_v
