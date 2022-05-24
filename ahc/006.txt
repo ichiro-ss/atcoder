@@ -1,0 +1,16 @@
+# nearest neighbor algorithm
+phase 1. visit the nearest store from now position 50 times 
+(each of them accept 1 time visit)
+orders = []
+from his office (400, 400)
+for 50 times:
+    position = the place that have minimal distance from former position
+        and not visited before
+    orders.append(position)
+    visited[position] = True
+
+for orders
+    position = the place that have minimal distance from former position
+        and not visited before
+    houses.append(position)
+    delivered[position] = True
