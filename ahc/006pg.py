@@ -3,6 +3,7 @@
 # he can deliver orders once the order is received
 # In short, allow orders to be delivered before all orders are received
 
+import statistics
 # input
 n_order = 1000
 a, b, c, d = [0]*n_order, [0]*n_order, [0]*n_order,  [0]*n_order
@@ -17,12 +18,23 @@ deliverd = [False for _ in range(50)]
 footprints = [[400, 400]]
 orders = []
 
+# remove distant points 
+removed = [False for _ in range(n_order)]
+all_dist = [0] * n_order
+for i in range(n_order):
+    all_dist[i] = dist(400, 400, a[i], b[i]) + dist(400, 400, c[i], d[i])
+med_dist = statistics.median(all_dist)
+for i in range(n_order):
+    if all_dist[i] > med_dist:
+        removed[i] = True
+    
+
 now_x, now_y, now_i = 400, 400, -1
 while len(orders) < 50:
     min_i, min_d = 0, 10 ** 6
     receiving = True
     for i in range(n_order):
-        if visited[i]:
+        if visited[i] or removed[i]:
             continue
         now_d = dist(a[i], b[i], now_x, now_y)
         if now_d < min_d:
