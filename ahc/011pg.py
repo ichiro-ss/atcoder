@@ -1,10 +1,10 @@
-from random import shuffle
+# from random import shuffle
 from random import randrange
 import copy
-import sys
+# import sys
 import time
 st = time.time()
-sys.setrecursionlimit(10 ** 9)
+# sys.setrecursionlimit(10 ** 9)
 # input
 n, T = [int(_) for _ in input().split()]
 t = [[int(_, base = 16) for _ in list(input())] for _ in range(n)]
@@ -105,18 +105,18 @@ def swap(y1, x1, y2, x2, tht):
 #         ans_way = so_far
 #     return
 
-LIMIT = min(4 * n * n, T)
+# LIMIT = min(4 * n * n, T)
 all_max_idx, all_max_v, all_ans_way = 0, 0, ""
 while True:
     ch_t = copy.deepcopy(t)
-    if time.time() - st > 1.9:
+    if time.time() - st > 2.85:
         break
     max_idx, max_v, ans_way = 0, 0, ""
     pr_h, pr_w = sh, sw
     pre_dir = -4
     i = 0
-    while len(ans_way) < LIMIT:
-        if time.time() - st > 1.9:
+    while len(ans_way) < T:
+        if time.time() - st > 2.85:
             break
         idx = randrange(4)
         if idx == nway(pre_dir):
@@ -137,7 +137,7 @@ while True:
             pre_dir = idx
     if all_max_v < max_v or (all_max_v == max_v and all_max_idx > max_idx):
         all_max_idx, all_max_v = max_idx, max_v
-        all_ans_way = copy.copy(ans_way[:all_max_idx])
+        all_ans_way = ans_way[:all_max_idx]
     
 print(all_ans_way)
 
