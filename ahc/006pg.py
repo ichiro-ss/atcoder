@@ -20,12 +20,20 @@ orders = []
 
 # remove distant points 
 removed = [False for _ in range(n_order)]
-all_dist = [0] * n_order
+ab_dist = [0] * n_order
 for i in range(n_order):
-    all_dist[i] = dist(400, 400, a[i], b[i]) + dist(400, 400, c[i], d[i])
-med_dist = statistics.median(all_dist)
+    ab_dist[i] = dist(400, 400, a[i], b[i])
+med_ab_dist = statistics.median(ab_dist)
 for i in range(n_order):
-    if all_dist[i] > med_dist:
+    if ab_dist[i] > med_ab_dist:
+        removed[i] = True
+
+cd_dist = [0] * n_order
+for i in range(n_order):
+    cd_dist[i] = dist(400, 400, c[i], d[i])
+med_cd_dist = statistics.median(cd_dist)
+for i in range(n_order):
+    if cd_dist[i] > med_cd_dist:
         removed[i] = True
     
 
