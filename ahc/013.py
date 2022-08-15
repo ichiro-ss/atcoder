@@ -1,6 +1,8 @@
 import random
 import sys
 from copy import deepcopy
+import time
+st = time.time()
 
 random.seed(1)
 
@@ -176,11 +178,18 @@ def main():
     for _ in range(N):
         C.append([int(v) for v in input()])
 
-    solver = Solver(N, K, deepcopy(C))
-    res = solver.solve()
+    max_res, max_v = Result([], []), 0
+    while True:
+        if time.time() - st > 2.7:
+            break
+        solver = Solver(N, K, deepcopy(C))
+        res = solver.solve()
+        v = calc_score(N, K, deepcopy(C), res)
+        if max_v < v:
+            max_res, max_v = res, v
     # print(f"Score = {calc_score(N, K, deepcopy(C), res)}", file=sys.stderr)
 
-    print_answer(res)
+    print_answer(max_res)
 
 
 if __name__ == "__main__":
