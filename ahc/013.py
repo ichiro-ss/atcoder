@@ -4,8 +4,6 @@ from copy import deepcopy
 import time
 st = time.time()
 
-random.seed(1)
-
 
 class Result:
 
