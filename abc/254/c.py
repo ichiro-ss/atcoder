@@ -1,6 +1,3 @@
-from termios import CINTR
-
-
 n, k = [int(_) for _ in input().split()]
 a = [int(_) for _ in input().split()]
 sa = sorted(a)
