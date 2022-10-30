@@ -91,7 +91,7 @@ class Solver:
 
     def solve(self):
         # create random moves
-        moves = self._move()
+        moves = []
         # from each computer, connect to right and/or bottom if it will reach the same type
         connects = self._connect(self.LIM - len(moves))
 
