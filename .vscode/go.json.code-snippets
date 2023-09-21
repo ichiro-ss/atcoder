@@ -77,5 +77,15 @@
 			"}"
 		],
 		"description": "for range statement"
-	}
+	},
+
+	"fmt.Scanf": {
+		"scope": "go",
+		"prefix": "fs",
+		"body": [
+			"fmt.Scanf(\"%${1:d}\", ${2:&x})"
+		],
+		"description": "fmt.Scanf"
+	},
+
 }
