@@ -28,6 +28,32 @@
 		"description": "package main"
 	},
 
+	"atcoder init": {
+		"scope": "go",
+		"prefix": "init",
+		"body": [
+			"package main",
+			"",
+			"import (",
+			"\t\"bufio\"",
+			"\t\"fmt\"",
+			"\t\"io\"",
+			"\t\"os\"",
+			")",
+			"func run(_r io.Reader, _w io.Writer) {",
+			"\tin := bufio.NewReader(_r)",
+			"\tout := bufio.NewWriter(_w)",
+			"\tdefer out.Flush()",
+			"",
+			"\tvar ${1:n} ${2:int}"
+			"\t$3",
+			"\tfmt.Fprintln(out, $4)",
+			"}",
+			"",
+			"func main() { run(os.Stdin, os.Stdout) }"
+		]
+	}
+
 	"if err != nil": {
 		"scope": "go",
 		"prefix": "iferr",
@@ -83,9 +109,46 @@
 		"scope": "go",
 		"prefix": "fs",
 		"body": [
-			"fmt.Scanf(\"%${1:d}\", ${2:&x})"
+			"fmt.Scanf(\"%${1:d}\", &${2:x})"
 		],
 		"description": "fmt.Scanf"
 	},
 
+
+
+	"scan array": {
+		"scope": "go",
+		"prefix": "arrayscan",
+		"body": [
+			"for ${1:i} := ${2:0}; $1 < ${3:count}; $1${4:++} {"
+			"\tfmt.Scanf(\"%${5:d}\", &${6:val})"
+			"\t${7:a} = append($7, $6)"
+			"}"
+		]
+	},
+
+	"sort ascending order": {
+		"scope": "go",
+		"prefix": "asc_sort",
+		"body": [
+			"sort.${1:Ints}(${2:slice})"
+		]
+	},
+
+	"sort descending order": {
+		"scope": "go",
+		"prefix": "desc_sort",
+		"body": [
+			"sort.Sort(sort.Reverse(sort.${1:Int}Slice(${2:slice})))"
+		]
+	},
+
+	"bisect": {
+		"scope": "go",
+		"prefix": "bisect",
+		"body": [
+			"sort.Search(len(${1:slice}), func(${2:i} int) bool { return $1[$2] >= ${3:x} })"
+		],
+		"description": "return the index which satisfies slice[i] >= x first"
+	},
 }
