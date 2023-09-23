@@ -1,0 +1,28 @@
+version: "3"
+
+tasks:
+  default:
+    desc: show commands
+    cmds:
+      - task --list
+
+  abc:
+    desc: create a,b,c,d/main.go in (arg) (ex. -- 255)
+    dir: abc
+    cmds:
+      - mkdir {{ .CLI_ARGS }}
+      - mkdir {{ .CLI_ARGS }}/{a,b,c,d}
+      - touch {{ .CLI_ARGS }}/{a,b,c,d}/main.go
+
+  runabc:
+    desc: go run abc/(arg)/main.go (ex. -- 255/a)
+    dir: abc/{{ .CLI_ARGS }}
+    cmds:
+      - go run main.go
+
+  git:
+    desc: add, commit -m (arg), push (ex. -- solved 255/a)
+    cmds:
+      - git add .
+      - git commit -m "{{ .CLI_ARGS }}"
+      - git push origin main
