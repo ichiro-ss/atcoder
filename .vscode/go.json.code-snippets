@@ -40,6 +40,7 @@
 			"\t\"io\"",
 			"\t\"os\"",
 			")",
+			"",
 			"func run(_r io.Reader, _w io.Writer) {",
 			"\tin := bufio.NewReader(_r)",
 			"\tout := bufio.NewWriter(_w)",
