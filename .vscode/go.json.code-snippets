@@ -43,7 +43,7 @@
 		"scope": "go",
 		"prefix": "fp",
 		"body": [
-			"fmt.Println(\"$0\")"
+			"fmt.Println($0)"
 		],
 		"description": "fmt.Println"
 	},
