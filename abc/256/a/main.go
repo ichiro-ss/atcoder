@@ -14,12 +14,12 @@ func run(_r io.Reader, _w io.Writer) {
 	defer out.Flush()
 
 	var n float64
-	fmt.Fscan(in, n)
+	fmt.Fscan(in, &n)
 
 	var res float64
 
 	res = math.Pow(2, n)
-	fmt.Fprintln(out, res)
+	fmt.Fprintln(out, int(res))
 }
 
 func main() { run(os.Stdin, os.Stdout) }
