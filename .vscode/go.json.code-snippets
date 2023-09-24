@@ -48,7 +48,9 @@
 			"",
 			"\tvar ${1:n} ${2:int}"
 			"\t$3",
-			"\tfmt.Fprintln(out, $4)",
+			"\tvar res int",
+			"",
+			"\tfmt.Fprintln(out, res)",
 			"}",
 			"",
 			"func main() { run(os.Stdin, os.Stdout) }"

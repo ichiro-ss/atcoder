@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"math"
 	"os"
 )
 
@@ -12,9 +13,13 @@ func run(_r io.Reader, _w io.Writer) {
 	out := bufio.NewWriter(_w)
 	defer out.Flush()
 
-	var n int
+	var n float64
+	fmt.Fscan(in, n)
 
-	fmt.Fprintln(out)
+	var res float64
+
+	res = math.Pow(2, n)
+	fmt.Fprintln(out, res)
 }
 
 func main() { run(os.Stdin, os.Stdout) }
