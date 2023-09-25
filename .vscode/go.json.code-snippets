@@ -55,7 +55,7 @@
 			"",
 			"func main() { run(os.Stdin, os.Stdout) }"
 		]
-	}
+	},
 
 	"if err != nil": {
 		"scope": "go",
