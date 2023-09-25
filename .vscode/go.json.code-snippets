@@ -117,6 +117,14 @@
 		"description": "fmt.Scanf"
 	},
 
+	"fmt.Fscan": {
+		"scope": "go",
+		"prefix": "infscan",
+		"body": [
+			"fmt.Fscan(in, &${2:x})"
+		],
+		"description": "fmt.Fscan"
+	},
 
 
 	"scan array": {
@@ -153,5 +161,16 @@
 			"sort.Search(len(${1:slice}), func(${2:i} int) bool { return $1[$2] >= ${3:x} })"
 		],
 		"description": "return the index which satisfies slice[i] >= x first"
+	},
+
+	"make array": {
+		"scope": "go",
+		"prefix": "mkslice",
+		"body": [
+			"${1:a} := make([]${2:int}, ${3:k})",
+			"for ${4:i} := range $1 {",
+			"\tfmt.Fscan(in, &$1[$4])",
+			"}",
+		]
 	},
 }
