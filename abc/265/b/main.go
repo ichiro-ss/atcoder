@@ -22,18 +22,19 @@ func run(_r io.Reader, _w io.Writer) {
 	}
 	for i := 0; i < m; i++ {
 		fmt.Fscan(in, &x, &y)
-		bonus[x-1] = y
+		bonus[x-2] = y
 	}
-
+	// fmt.Fprintln(out, bonus)
 	res := "Yes"
 	for i := 0; i < n-1; i++ {
 		t -= a[i]
-		t += bonus[i]
-		if t < 0 {
+		if t <= 0 {
 			res = "No"
 			break
 		}
-		fmt.Fprintln(out, t)
+		t += bonus[i]
+
+		// fmt.Fprintln(out, t)
 	}
 
 	fmt.Fprintln(out, res)
