@@ -3,21 +3,23 @@ package main
 import (
 	"fmt"
 	"io"
+	"math"
+	"math/rand"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // 貪欲：連結成分の小さい順に結合していく
-func gComponentNum(n, k, l int, c [][]int) []int {
-	uf := newUnionFind(k)
-	linkWith := *connectComponent(n, k, c)
+func gComponentNum(numCity, numSp int, linkWith [][]int) []int {
+	uf := newUnionFind(numCity)
 
 	// 連結成分をk-l回結合
-	for i := 0; i < k-l; i++ {
+	for i := 0; i < numCity-numSp; i++ {
 		minSize := 1000000
 		mergeJ, mergeLink := -1, -1
-		for j := 0; j < k; j++ {
+		for j := 0; j < numCity; j++ {
 			for _, link := range linkWith[j] {
 				if !uf.isSame(j, link) {
 					sizeJ, sizeLink := uf.size(j), uf.size(link)
@@ -34,16 +36,16 @@ func gComponentNum(n, k, l int, c [][]int) []int {
 
 	// root : idx
 	city20 := make(map[int]int)
-	cnt := 1
-	for i := 0; i < k; i++ {
+	cnt := 0
+	for i := 0; i < numCity; i++ {
 		root := uf.find(i)
 		if _, ok := city20[root]; !ok {
 			city20[root] = cnt
 			cnt++
 		}
 	}
-	res := make([]int, k)
-	for i := 0; i < k; i++ {
+	res := make([]int, numCity)
+	for i := 0; i < numCity; i++ {
 		root := uf.find(i)
 		res[i] = city20[root]
 	}
@@ -51,29 +53,29 @@ func gComponentNum(n, k, l int, c [][]int) []int {
 }
 
 // 連結成分をまとめる
-func connectComponent(n, k int, c [][]int) *[][]int {
+func connectComponent(numSquare, numCity int, city [][]int) *[][]int {
 	dir := [4][2]int{{0, 1}, {1, 0}}
-	linkWith := make([][]int, k)
-	isLinked := make([][]bool, k)
-	for i := 0; i < k; i++ {
-		isLinked[i] = make([]bool, k)
+	linkWith := make([][]int, numCity)
+	isLinked := make([][]bool, numCity)
+	for i := 0; i < numCity; i++ {
+		isLinked[i] = make([]bool, numCity)
 	}
-	for i := 0; i < n; i++ {
-		for j := 0; j < n; j++ {
-			if c[i][j] < 0 {
+	for i := 0; i < numSquare; i++ {
+		for j := 0; j < numSquare; j++ {
+			if city[i][j] < 0 {
 				continue
 			}
 			for _, d := range dir {
 				x, y := i+d[0], j+d[1]
-				if x >= 0 && x < n && y >= 0 && y < n {
-					if c[i][j] == c[x][y] || c[x][y] < 0 {
+				if x >= 0 && x < numSquare && y >= 0 && y < numSquare {
+					if city[i][j] == city[x][y] || city[x][y] < 0 {
 						continue
 					}
-					if !isLinked[c[i][j]][c[x][y]] {
-						linkWith[c[i][j]] = append(linkWith[c[i][j]], c[x][y])
-						linkWith[c[x][y]] = append(linkWith[c[x][y]], c[i][j])
-						isLinked[c[i][j]][c[x][y]] = true
-						isLinked[c[x][y]][c[i][j]] = true
+					if !isLinked[city[i][j]][city[x][y]] {
+						linkWith[city[i][j]] = append(linkWith[city[i][j]], city[x][y])
+						linkWith[city[x][y]] = append(linkWith[city[x][y]], city[i][j])
+						isLinked[city[i][j]][city[x][y]] = true
+						isLinked[city[x][y]][city[i][j]] = true
 					}
 				}
 			}
@@ -82,33 +84,145 @@ func connectComponent(n, k int, c [][]int) *[][]int {
 	return &linkWith
 }
 
+func dfs(c int, res []int, visited *[]bool, linkWith [][]int) {
+	(*visited)[c] = true
+	for _, linkCity := range linkWith[c] {
+		if res[linkCity] == res[c] && !(*visited)[linkCity] {
+			dfs(linkCity, res, visited, linkWith)
+		}
+	}
+}
+
+func getScore(numCity, numSp int, res []int, numPpl, numEmp []int, linkWith [][]int) (int, int, int, int, float64) {
+	visited := make([]bool, numCity)
+	for i := 0; i < numSp; i++ {
+		c := -1
+		for j := 0; j < numCity; j++ {
+			if res[j] == i {
+				c = j
+			}
+		}
+		if c == -1 {
+			// fmt.Println("sp not exist")
+			return -1, -1, -1, -1, 0
+		}
+		dfs(c, res, &visited, linkWith)
+	}
+	for i := 0; i < numCity; i++ {
+		if !visited[i] {
+			// fmt.Println("not connected")
+			return -1, -1, -1, -1, 0
+		}
+	}
+
+	p, q := make([]int, numSp), make([]int, numSp)
+	for i := 0; i < numCity; i++ {
+		p[res[i]] += numPpl[i]
+		q[res[i]] += numEmp[i]
+	}
+
+	pMinIdx, pMin := arrayMin(p)
+	pMaxIdx, pMax := arrayMax(p)
+	qMinIdx, qMin := arrayMin(q)
+	qMaxIdx, qMax := arrayMax(q)
+
+	return pMinIdx, pMaxIdx, qMinIdx, qMaxIdx, math.Min(float64(pMin)/float64(pMax), float64(qMin)/float64(qMax))
+}
+
 func main() {
+	TIMELIMIT := 0.95
+	st := time.Now()
 	// n, k, l, a, b, c := input(getStdin())
-	n, k, l, _, _, c := input(getStdin())
+	numSquare, numCity, numSp, numPpl, numEmp, city := input(getStdin())
 
-	ans := gComponentNum(n, k, l, c)
+	linkWith := *connectComponent(numSquare, numCity, city)
 
-	output(k, l, ans)
+	res := gComponentNum(numCity, numSp, linkWith)
+	bestRes := make([]int, numCity)
+	copy(bestRes, res)
+
+	_, _, _, _, curScore := getScore(numCity, numSp, res, numPpl, numEmp, linkWith)
+	for time.Since(st).Seconds() < TIMELIMIT {
+		for {
+			// fmt.Println("kick:", curScore)
+			randCity := rand.Intn(numCity)
+			l := linkWith[randCity][rand.Intn(len(linkWith[randCity]))]
+			resRandCity := res[randCity]
+			resL := res[l]
+			res[randCity], res[l] = resL, resRandCity
+			_, _, _, _, nowScore := getScore(numCity, numSp, res, numPpl, numEmp, linkWith)
+			if res[randCity] != res[l] && nowScore > 0 {
+				_, _, _, _, curScore = getScore(numCity, numSp, res, numPpl, numEmp, linkWith)
+				break
+			} else {
+				res[randCity], res[l] = resRandCity, resL
+			}
+			if time.Since(st).Seconds() > TIMELIMIT {
+				break
+			}
+		}
+		for {
+			isResChanged := false
+			randCities := make([]int, numCity)
+			for i := 0; i < numCity; i++ {
+				randCities[i] = i
+			}
+			rand.Shuffle(numCity, func(i, j int) {
+				randCities[i], randCities[j] = randCities[j], randCities[i]
+			})
+			for c1 := range randCities {
+				for linkCity := range linkWith[c1] {
+					if res[c1] == res[linkCity] {
+						continue
+					}
+					oldSp := res[c1]
+					res[c1] = res[linkCity]
+					_, _, _, _, newScore := getScore(numCity, numSp, res, numPpl, numEmp, linkWith)
+					// if newScore > 0.3 {
+					// 	fmt.Println("shift", c1, ":", oldSp, "->", res[c1])
+					// }
+					if newScore > curScore {
+						// fmt.Println("ls:", curScore)
+						curScore = newScore
+						isResChanged = true
+					} else {
+						res[c1] = oldSp
+					}
+
+					if time.Since(st).Seconds() > TIMELIMIT {
+						break
+					}
+				}
+			}
+			if !isResChanged {
+				break
+			}
+		}
+		if _, _, _, _, score := getScore(numCity, numSp, bestRes, numPpl, numEmp, linkWith); curScore > score {
+			copy(bestRes, res)
+		}
+	}
+	output(numCity, numSp, bestRes)
 }
 
 // check if ans is valid
-func isValid(k, l int, ans []int) bool {
+func isValid(numCity, numSp int, ans []int) bool {
 	res := true
-	if len(ans) != k {
+	if len(ans) != numCity {
 		fmt.Println("len(ans) != K(400)")
 		res = false
 	}
 	for _, a := range ans {
-		if a < 1 || a > l {
+		if a < 0 || a > numSp-1 {
 			fmt.Println("a < 1 || a > L(20)")
 			res = false
 		}
 	}
-	isExist := make([]bool, l)
+	isExist := make([]bool, numSp)
 	for _, a := range ans {
-		isExist[a-1] = true
+		isExist[a] = true
 	}
-	for i := 0; i < l; i++ {
+	for i := 0; i < numSp; i++ {
 		if !isExist[i] {
 			fmt.Println(i+1, "city is not used")
 			res = false
@@ -163,34 +277,57 @@ func getStdin() []string {
 
 func input(lines []string) (int, int, int, []int, []int, [][]int) {
 	line0 := strings.Split(lines[0], " ")
-	n, _ := strconv.Atoi(line0[0])
-	k, _ := strconv.Atoi(line0[1])
-	l, _ := strconv.Atoi(line0[2])
+	numSquare, _ := strconv.Atoi(line0[0])
+	numCity, _ := strconv.Atoi(line0[1])
+	numSp, _ := strconv.Atoi(line0[2])
 
-	a := make([]int, k)
-	b := make([]int, k)
-	for i, line := range lines[1 : k+1] {
+	numPpl := make([]int, numCity)
+	numEmp := make([]int, numCity)
+	for i, line := range lines[1 : numCity+1] {
 		ab := strings.Split(line, " ")
-		a[i], _ = strconv.Atoi(ab[0])
-		b[i], _ = strconv.Atoi(ab[1])
+		numPpl[i], _ = strconv.Atoi(ab[0])
+		numEmp[i], _ = strconv.Atoi(ab[1])
 	}
 
-	c := make([][]int, n)
-	for i, line := range lines[k+1:] {
-		c[i] = make([]int, n)
+	city := make([][]int, numSquare)
+	for i, line := range lines[numCity+1:] {
+		city[i] = make([]int, numSquare)
 		for j, s := range strings.Split(line, " ") {
-			c[i][j], _ = strconv.Atoi(s)
-			c[i][j]--
+			city[i][j], _ = strconv.Atoi(s)
+			city[i][j]--
 		}
 	}
 
-	return n, k, l, a, b, c
+	return numSquare, numCity, numSp, numPpl, numEmp, city
 }
 
-func output(k, l int, ans []int) {
-	if isValid(k, l, ans) {
-		for _, a := range ans {
-			fmt.Println(a)
+func output(numCity, numSp int, res []int) {
+	if isValid(numCity, numSp, res) {
+		for _, r := range res {
+			fmt.Println(r + 1)
 		}
 	}
+}
+
+func arrayMin(a []int) (int, int) {
+	min := a[0]
+	idx := 0
+	for i, v := range a {
+		if v < min {
+			min = v
+			idx = i
+		}
+	}
+	return idx, min
+}
+func arrayMax(a []int) (int, int) {
+	max := a[0]
+	idx := 0
+	for i, v := range a {
+		if v > max {
+			max = v
+			idx = i
+		}
+	}
+	return idx, max
 }
